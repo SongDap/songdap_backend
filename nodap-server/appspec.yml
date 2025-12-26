@@ -1,0 +1,19 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/backend # JAR 파일 등이 복사될 위치
+    overwrite: yes
+
+permissions:
+  - object: /home/ubuntu/backend
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+
+hooks:
+  # 파일 복사가 끝난 후, 아래 스크립트를 실행합니다.
+  AfterInstall:
+    - location: scripts/deploy.sh
+      timeout: 300
+      runas: ubuntu
