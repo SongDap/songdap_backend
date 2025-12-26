@@ -1,0 +1,44 @@
+# ============================================
+# 프로덕션 환경 설정
+# 모든 민감 정보는 환경 변수로 주입됩니다.
+# ============================================
+
+spring:
+  # MySQL 데이터베이스 설정
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # JPA 프로덕션 설정
+  jpa:
+    hibernate:
+      ddl-auto: validate  # 프로덕션에서는 validate 또는 none 권장
+    show-sql: false
+
+  # Redis 설정
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      timeout: 6000ms
+
+  # Session 타임아웃
+  session:
+    timeout: 3600
+
+# 프로덕션 로깅 (민감 정보 노출 방지)
+logging:
+  level:
+    root: WARN
+    com.nodap: INFO
+    org.hibernate.SQL: WARN
+

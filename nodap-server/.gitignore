@@ -1,0 +1,75 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### 민감 정보 파일 ###
+# 로컬 개발 환경 설정 (DB 비밀번호 등 포함)
+**/application-local.yml
+**/application-dev.yml
+
+# 환경 변수 파일
+.env
+.env.local
+.env.*.local
+
+# 시크릿 키 파일
+*.pem
+*.key
+
+### 로그 파일 ###
+*.log
+logs/
+nohup.out
+
+### OS 생성 파일 ###
+.DS_Store
+.DS_Store?
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+### 임시/백업 파일 ###
+*.tmp
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+
+### 빌드 산출물 ###
+*.jar
+!gradle/wrapper/gradle-wrapper.jar

@@ -1,0 +1,42 @@
+# ============================================
+# 로컬 개발 환경 설정 예시 파일
+# 이 파일을 복사하여 application-local.yml로 저장하고
+# 실제 값을 입력하세요.
+# ============================================
+
+spring:
+  # MySQL 데이터베이스 설정
+  datasource:
+    url: jdbc:mysql://localhost:3306/nodap?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: root
+    password: your_mysql_password  # 실제 비밀번호로 변경
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  # JPA 로컬 설정
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  # Redis 설정
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:  # Redis 비밀번호 (없으면 빈칸)
+      timeout: 6000ms
+
+  # Session 타임아웃
+  session:
+    timeout: 1800
+
+# 로컬 개발용 상세 로깅
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+
