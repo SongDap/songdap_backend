@@ -24,9 +24,9 @@ jobs:
         run: ./gradlew build -x test
 
       - name: Make zip file
-        run: zip -r ./$GITHUB_SHA.zip .
+        run: zip -r ../$GITHUB_SHA.zip .
         shell: bash
-        working-directory: .
+        # nodap-server 폴더 내에서 zip 생성 (appspec.yml이 루트에 위치하게 됨)
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -36,8 +36,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Upload to S3
-        run: aws s3 cp --region ${{ secrets.AWS_REGION }} ./$GITHUB_SHA.zip s3://${{ secrets.S3_BUCKET_NAME }}/$GITHUB_SHA.zip
-        working-directory: .
+        run: aws s3 cp --region ${{ secrets.AWS_REGION }} ../$GITHUB_SHA.zip s3://${{ secrets.S3_BUCKET_NAME }}/$GITHUB_SHA.zip
 
       - name: CodeDeploy
         run: |
@@ -46,4 +45,3 @@ jobs:
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name ${{ secrets.CODE_DEPLOY_GROUP_NAME }} \
             --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=$GITHUB_SHA.zip
-        working-directory: .
