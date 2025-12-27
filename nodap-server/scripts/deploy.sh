@@ -15,28 +15,37 @@ echo "> REPOSITORY: $REPOSITORY"
 echo "> SERVICE: $SERVICE_NAME"
 echo "============================================"
 
-# 2. JAR 파일 확인
-echo "> JAR 파일 확인 중..."
-JAR_SOURCE=$(ls -tr $REPOSITORY/*.jar 2>/dev/null | tail -n 1)
+# 2. 새로 빌드된 JAR 파일 찾기 (nodap-server.jar 제외)
+echo "> 새로 빌드된 JAR 파일 확인 중..."
+JAR_SOURCE=$(ls -tr $REPOSITORY/*.jar 2>/dev/null | grep -v "nodap-server.jar" | tail -n 1)
 
 if [ -z "$JAR_SOURCE" ]; then
-    echo "> [에러] JAR 파일을 찾을 수 없습니다: $REPOSITORY/*.jar"
+    echo "> [에러] 새로운 JAR 파일을 찾을 수 없습니다: $REPOSITORY/*.jar"
+    echo "> (nodap-server.jar 제외)"
     exit 1
 fi
 
-echo "> 원본 JAR: $JAR_SOURCE"
+echo "> 새로운 JAR 찾음: $JAR_SOURCE"
 
 # 3. JAR 파일 이름 통일 (systemd 서비스에서 고정된 이름 사용)
-echo "> JAR 파일 준비: $JAR_SOURCE -> $JAR_TARGET"
+echo "> JAR 파일 이름을 nodap-server.jar로 통일합니다."
+echo "> $JAR_SOURCE -> $JAR_TARGET"
 cp "$JAR_SOURCE" "$JAR_TARGET"
 chmod +x "$JAR_TARGET"
 
-# 4. systemd 서비스 재시작
+# 4. 복사 확인
+if [ ! -f "$JAR_TARGET" ]; then
+    echo "> [에러] JAR 파일 복사 실패!"
+    exit 1
+fi
+echo "> JAR 파일 복사 완료: $(ls -lh $JAR_TARGET)"
+
+# 5. systemd 서비스 재시작
 echo "============================================"
-echo "> 서비스 재시작: $SERVICE_NAME"
+echo "> nodap 서비스를 재시작합니다."
 sudo systemctl restart $SERVICE_NAME
 
-# 5. 서비스 시작 확인 (최대 30초 대기)
+# 6. 서비스 시작 확인 (최대 30초 대기)
 echo "> 서비스 시작 확인 중..."
 WAIT_COUNT=0
 while [ $WAIT_COUNT -lt 30 ]; do
@@ -56,7 +65,7 @@ while [ $WAIT_COUNT -lt 30 ]; do
     echo "> 서비스 시작 대기 중... ($WAIT_COUNT/30)"
 done
 
-# 6. 시작 실패 시 로그 출력
+# 7. 시작 실패 시 로그 출력
 echo "============================================"
 echo "> [에러] 서비스 시작 실패!"
 echo "> 최근 로그:"
