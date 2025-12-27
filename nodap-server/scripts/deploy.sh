@@ -6,22 +6,23 @@
 
 # 1. 경로 및 변수 설정
 REPOSITORY=/home/ubuntu/backend
+BUILD_DIR=$REPOSITORY/build/libs
 SERVICE_NAME=nodap
 JAR_TARGET=$REPOSITORY/nodap-server.jar
 
 echo "============================================"
 echo "> [배포 시작] $(date '+%Y-%m-%d %H:%M:%S')"
 echo "> REPOSITORY: $REPOSITORY"
+echo "> BUILD_DIR: $BUILD_DIR"
 echo "> SERVICE: $SERVICE_NAME"
 echo "============================================"
 
-# 2. 새로 빌드된 JAR 파일 찾기 (nodap-server.jar 제외)
+# 2. 새로 빌드된 JAR 파일 찾기 (build/libs 폴더에서)
 echo "> 새로 빌드된 JAR 파일 확인 중..."
-JAR_SOURCE=$(ls -tr $REPOSITORY/*.jar 2>/dev/null | grep -v "nodap-server.jar" | tail -n 1)
+JAR_SOURCE=$(ls -tr $BUILD_DIR/*.jar 2>/dev/null | grep -v "plain" | tail -n 1)
 
 if [ -z "$JAR_SOURCE" ]; then
-    echo "> [에러] 새로운 JAR 파일을 찾을 수 없습니다: $REPOSITORY/*.jar"
-    echo "> (nodap-server.jar 제외)"
+    echo "> [에러] 새로운 JAR 파일을 찾을 수 없습니다: $BUILD_DIR/*.jar"
     exit 1
 fi
 
@@ -45,10 +46,10 @@ echo "============================================"
 echo "> nodap 서비스를 재시작합니다."
 sudo systemctl restart $SERVICE_NAME
 
-# 6. 서비스 시작 확인 (최대 30초 대기)
+# 6. 서비스 시작 확인 (최대 60초 대기)
 echo "> 서비스 시작 확인 중..."
 WAIT_COUNT=0
-while [ $WAIT_COUNT -lt 30 ]; do
+while [ $WAIT_COUNT -lt 60 ]; do
     sleep 1
     WAIT_COUNT=$((WAIT_COUNT + 1))
     
@@ -62,7 +63,10 @@ while [ $WAIT_COUNT -lt 30 ]; do
         exit 0
     fi
     
-    echo "> 서비스 시작 대기 중... ($WAIT_COUNT/30)"
+    # 10초마다 로그 출력
+    if [ $((WAIT_COUNT % 10)) -eq 0 ]; then
+        echo "> 서비스 시작 대기 중... ($WAIT_COUNT/60)"
+    fi
 done
 
 # 7. 시작 실패 시 로그 출력
