@@ -1,26 +1,65 @@
 #!/bin/bash
 
+# ============================================
+# SongDap Backend 배포 스크립트 (systemd 방식)
+# ============================================
+
+# 1. 경로 및 변수 설정
 REPOSITORY=/home/ubuntu/backend
-PROJECT_NAME=your-project-name # 여기에 실제 프로젝트 이름을 적으세요 (JAR 파일명에 포함되는 이름)
+SERVICE_NAME=nodap
+JAR_TARGET=$REPOSITORY/nodap-server.jar
 
-echo "> 현재 실행 중인 애플리케이션 PID 확인"
-CURRENT_PID=$(pgrep -fl $PROJECT_NAME | grep jar | awk '{print $1}')
+echo "============================================"
+echo "> [배포 시작] $(date '+%Y-%m-%d %H:%M:%S')"
+echo "> REPOSITORY: $REPOSITORY"
+echo "> SERVICE: $SERVICE_NAME"
+echo "============================================"
 
-if [ -z "$CURRENT_PID" ]; then
-    echo "> 현재 실행 중인 애플리케이션이 없으므로 종료하지 않습니다."
-else
-    echo "> kill -15 $CURRENT_PID"
-    kill -15 $CURRENT_PID
-    sleep 5
+# 2. JAR 파일 확인
+echo "> JAR 파일 확인 중..."
+JAR_SOURCE=$(ls -tr $REPOSITORY/*.jar 2>/dev/null | tail -n 1)
+
+if [ -z "$JAR_SOURCE" ]; then
+    echo "> [에러] JAR 파일을 찾을 수 없습니다: $REPOSITORY/*.jar"
+    exit 1
 fi
 
-echo "> 새 애플리케이션 배포"
-JAR_NAME=$(ls -tr $REPOSITORY/*.jar | tail -n 1)
+echo "> 원본 JAR: $JAR_SOURCE"
 
-echo "> JAR Name: $JAR_NAME"
-echo "> $JAR_NAME 에 실행권한 추가"
-chmod +x $JAR_NAME
+# 3. JAR 파일 이름 통일 (systemd 서비스에서 고정된 이름 사용)
+echo "> JAR 파일 준비: $JAR_SOURCE -> $JAR_TARGET"
+cp "$JAR_SOURCE" "$JAR_TARGET"
+chmod +x "$JAR_TARGET"
 
-echo "> $JAR_NAME 실행"
-# 로그는 nohup.out에 기록되며, 백그라운드에서 실행됩니다.
-nohup java -jar $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
+# 4. systemd 서비스 재시작
+echo "============================================"
+echo "> 서비스 재시작: $SERVICE_NAME"
+sudo systemctl restart $SERVICE_NAME
+
+# 5. 서비스 시작 확인 (최대 30초 대기)
+echo "> 서비스 시작 확인 중..."
+WAIT_COUNT=0
+while [ $WAIT_COUNT -lt 30 ]; do
+    sleep 1
+    WAIT_COUNT=$((WAIT_COUNT + 1))
+    
+    if sudo systemctl is-active --quiet $SERVICE_NAME; then
+        echo "============================================"
+        echo "> [성공] 배포 완료! $(date '+%Y-%m-%d %H:%M:%S')"
+        echo "> 서비스 상태: $(sudo systemctl is-active $SERVICE_NAME)"
+        echo "> 상태 확인: sudo systemctl status $SERVICE_NAME"
+        echo "> 로그 확인: sudo journalctl -u $SERVICE_NAME -f"
+        echo "============================================"
+        exit 0
+    fi
+    
+    echo "> 서비스 시작 대기 중... ($WAIT_COUNT/30)"
+done
+
+# 6. 시작 실패 시 로그 출력
+echo "============================================"
+echo "> [에러] 서비스 시작 실패!"
+echo "> 최근 로그:"
+sudo journalctl -u $SERVICE_NAME -n 50 --no-pager
+echo "============================================"
+exit 1
