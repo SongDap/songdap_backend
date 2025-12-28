@@ -31,19 +31,19 @@ public class Music extends BaseTimeEntity {
     @JoinColumn(name = "album_id", nullable = false)
     private Album album;
 
-    @Column(name = "title", nullable = false, length = 100)
+    @Column(name = "title", nullable = false, length = 128)
     private String title;
 
-    @Column(name = "artist", length = 100)
+    @Column(name = "artist", length = 64)
     private String artist;
 
-    @Column(name = "message", length = 1000)
+    @Column(name = "message", columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "url", nullable = false, length = 512)
     private String url;
 
-    @Column(name = "writer", nullable = false, length = 50)
+    @Column(name = "writer", nullable = false, length = 64)
     private String writer;
 
     @Builder
