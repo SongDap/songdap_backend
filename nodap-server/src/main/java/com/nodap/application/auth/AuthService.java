@@ -15,6 +15,7 @@ import com.nodap.infrastructure.external.KakaoOAuthClient;
 import com.nodap.infrastructure.external.KakaoOAuthClient.KakaoTokenResponse;
 import com.nodap.infrastructure.external.KakaoOAuthClient.KakaoUserInfo;
 import com.nodap.interfaces.dto.auth.LoginResponse;
+import com.nodap.interfaces.dto.auth.UserSimpleInfo;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -221,6 +223,39 @@ public class AuthService {
         cookieProvider.addCookiesToResponse(response, accessToken, refreshToken);
         
         log.debug("[Auth] 토큰 발급 완료: userId={}", userId);
+    }
+
+    /**
+     * 개발용 로그인 (local 프로필 전용)
+     * userId로 바로 로그인하여 토큰 발급
+     */
+    @Transactional(readOnly = true)
+    public LoginResponse devLogin(Long userId, HttpServletResponse response) {
+        log.info("[Auth] 개발용 로그인 시작: userId={}", userId);
+        
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("[Error-USER_001] 개발용 로그인 실패 - 사용자 없음: userId={}", userId);
+                    return new BusinessException(ErrorCode.USER_NOT_FOUND);
+                });
+
+        // JWT 토큰 발급 및 쿠키 설정
+        issueTokensAndSetCookies(user.getId(), response);
+        
+        log.info("[Auth] 개발용 로그인 성공: userId={}, nickname={}", user.getId(), user.getNickname());
+        
+        return LoginResponse.of(user, false);
+    }
+
+    /**
+     * 전체 사용자 목록 조회 (개발용)
+     */
+    @Transactional(readOnly = true)
+    public List<UserSimpleInfo> getAllUsersForDev() {
+        log.debug("[Auth] 전체 사용자 목록 조회 (개발용)");
+        return userRepository.findAll().stream()
+                .map(UserSimpleInfo::from)
+                .toList();
     }
 
     /**

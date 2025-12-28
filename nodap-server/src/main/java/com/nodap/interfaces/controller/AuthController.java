@@ -51,9 +51,7 @@ public class AuthController {
                 LoginResponse loginResponse = authService.loginWithKakao(
                                 request.getAuthorizationCode(), response);
 
-                String message = loginResponse.isNewMember() ? "회원가입 및 로그인 성공" : "로그인 성공";
-
-                return ResponseEntity.ok(ApiResponse.success(message, loginResponse));
+                return ResponseEntity.ok(ApiResponse.success("로그인 성공", loginResponse));
         }
 
         /**
