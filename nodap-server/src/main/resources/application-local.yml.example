@@ -1,42 +1,71 @@
 # ============================================
 # 로컬 개발 환경 설정 예시 파일
-# 이 파일을 복사하여 application-local.yml로 저장하고
-# 실제 값을 입력하세요.
+# ============================================
+# 사용 방법:
+# 1. 이 파일을 복사하여 application-local.yml로 저장
+# 2. 카카오 OAuth 값을 팀에서 공유받은 값으로 변경
+# 3. Git에 커밋하지 마세요! (.gitignore에 포함됨)
 # ============================================
 
 spring:
   # MySQL 데이터베이스 설정
+  # ⚠️ 포트가 33060입니다! (Windows Docker 포트 이슈)
   datasource:
-    url: jdbc:mysql://localhost:3306/nodap_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:33060/nodap_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: root
-    password: your_mysql_password  # 실제 비밀번호로 변경
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 5
       minimum-idle: 2
       connection-timeout: 30000
 
-  # JPA 로컬 설정
+  # JPA 로컬 설정 (Flyway 사용으로 validate)
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
+
+  # Flyway 로컬 설정
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
   # Redis 설정
   data:
     redis:
       host: localhost
       port: 6379
-      password:  # Redis 비밀번호 (없으면 빈칸)
+      password:  # Docker Redis는 비밀번호 없음
       timeout: 6000ms
-
-  # Session 타임아웃
-  session:
-    timeout: 1800
 
 # 로컬 개발용 상세 로깅
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+    org.flywaydb: DEBUG
 
+# ============================================
+# JWT 설정
+# ============================================
+jwt:
+  secret: local-dev-secret-key-must-be-at-least-32-characters-long-for-hs256
+  access-token-expiry: 1800000      # 30분
+  refresh-token-expiry: 604800000   # 7일
+
+# ============================================
+# 카카오 OAuth 설정
+# ⚠️ 팀에서 공유받은 값으로 변경하세요!
+# ============================================
+oauth:
+  kakao:
+    client-id: YOUR_KAKAO_REST_API_KEY      # 팀 공유 값으로 변경
+    client-secret:                           # 선택 (없으면 빈칸)
+    redirect-uri: http://localhost:3000/oauth/kakao/callback
+
+# ============================================
+# CORS 설정
+# ============================================
+cors:
+  allowed-origins: http://localhost:3000
