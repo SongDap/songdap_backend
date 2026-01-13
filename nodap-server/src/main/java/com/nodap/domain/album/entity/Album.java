@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,15 +39,11 @@ public class Album extends BaseTimeEntity {
     @Column(name = "title", nullable = false, length = 128)
     private String title;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "category", nullable = false, length = 128)
-    private Category category;
-
-    @Column(name = "category_detail", nullable = false, columnDefinition = "TEXT")
-    private String categoryDetail;
-
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "color", nullable = false, length = 20)
+    private String color;
 
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
@@ -59,15 +57,15 @@ public class Album extends BaseTimeEntity {
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Music> musics = new ArrayList<>();
 
+    private LocalDateTime deletedAt;
+
     @Builder
-    public Album(User user, String title, Category category, String categoryDetail,
-            String description, Boolean isPublic, Integer musicCountLimit) {
+    public Album(User user, String title, String description, String color, String cover, Boolean isPublic, Integer musicCountLimit) {
         this.uuid = UUID.randomUUID().toString();
         this.user = user;
         this.title = title;
-        this.category = category;
-        this.categoryDetail = categoryDetail;
         this.description = description;
+        this.color = color;
         this.isPublic = isPublic != null ? isPublic : false;
         this.musicCount = 0;
         this.musicCountLimit = musicCountLimit != null ? musicCountLimit : 0; // 0은 무한
@@ -78,20 +76,6 @@ public class Album extends BaseTimeEntity {
      */
     public void updateTitle(String title) {
         this.title = title;
-    }
-
-    /**
-     * 앨범 카테고리 변경
-     */
-    public void updateCategory(Category category) {
-        this.category = category;
-    }
-
-    /**
-     * 앨범 세부 카테고리 변경
-     */
-    public void updateCategoryDetail(String categoryDetail) {
-        this.categoryDetail = categoryDetail;
     }
 
     /**
@@ -159,4 +143,5 @@ public class Album extends BaseTimeEntity {
         }
         return this.musicCount < this.musicCountLimit;
     }
+
 }

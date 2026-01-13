@@ -46,8 +46,22 @@ public class Music extends BaseTimeEntity {
     @Column(name = "writer", nullable = false, length = 64)
     private String writer;
 
+    @Column(name = "image", nullable = false, length = 512)
+    private String image;
+
+    @Column(name = "pos_x", nullable = false)
+    private Double posX;
+
+    @Column(name = "pos_y", nullable = false)
+    private Double posY;
+
+    @Column(name = "card_length", nullable = false)
+    private Double cardLength;
+
+
     @Builder
-    public Music(Album album, String title, String artist, String message, String url, String writer) {
+    public Music(Album album, String title, String artist, String message, String url, String writer,
+                 String image, Double posX, Double posY, Double cardLength) {
         this.uuid = UUID.randomUUID().toString();
         this.album = album;
         this.title = title;
@@ -55,6 +69,10 @@ public class Music extends BaseTimeEntity {
         this.message = message;
         this.url = url;
         this.writer = writer;
+        this.image = image;
+        this.posX = posX;
+        this.posY = posY;
+        this.cardLength = cardLength;
 
         // 양방향 연관관계 설정
         if (album != null) {
@@ -96,5 +114,34 @@ public class Music extends BaseTimeEntity {
     public void updateWriter(String writer) {
         this.writer = writer;
     }
+
+    /**
+     * 이미지 변경
+     */
+    public void updateImage(String image) {
+        this.image = image;
+    }
+
+    /**
+     * X 좌표 변경
+     */
+    public void updatePosX(double posX) {
+        this.posX = posX;
+    }
+
+    /**
+     * Y 좌표 변경
+     */
+    public void updatePosY(double posY) {
+        this.posY = posY;
+    }
+
+    /**
+     * 카드 길이 변경
+     */
+    public void updateCardLength(double cardLength) {
+        this.cardLength = cardLength;
+    }
+
 }
 
