@@ -28,7 +28,7 @@ public class User extends BaseTimeEntity {
     @Column(name = "nickname", nullable = false, unique = true, length = 16)
     private String nickname;
 
-    @Column(name = "email", nullable = false, length = 128)
+    @Column(name = "email", nullable = true, length = 128)
     private String email;
 
     @Column(name = "profile_image", length = 256)
