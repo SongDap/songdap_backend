@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,13 +19,18 @@ import java.util.List;
 @Configuration
 public class SwaggerConfig {
 
+    @Value("${swagger.server-url:http://localhost:8080}")
+    private String serverUrl;
+
+    @Value("${swagger.server-description:API 서버}")
+    private String serverDescription;
+
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(apiInfo())
                 .servers(List.of(
-                        new Server().url("http://localhost:8080").description("로컬 개발 서버"),
-                        new Server().url("https://api.nodap.com").description("프로덕션 서버")
+                        new Server().url(serverUrl).description(serverDescription)
                 ))
                 .components(new Components()
                         .addSecuritySchemes("cookieAuth", new SecurityScheme()
