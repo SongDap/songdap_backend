@@ -4,6 +4,8 @@ import com.nodap.domain.album.entity.Category;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
 public class AlbumDetailResponse {
@@ -13,4 +15,6 @@ public class AlbumDetailResponse {
     private Boolean isPublic;
     private Integer musicCount;
     private Integer musicCountLimit;
+    private String color;
+    private LocalDateTime createdAt;
 }

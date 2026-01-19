@@ -78,7 +78,9 @@ public class AlbumService {
                 album.getDescription(),
                 album.getIsPublic(),
                 album.getMusicCount(),
-                album.getMusicCountLimit()
+                album.getMusicCountLimit(),
+                album.getColor(),
+                album.getCreatedAt()
         );
     }
 
