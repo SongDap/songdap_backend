@@ -100,3 +100,14 @@ springdoc:
     path: /swagger-ui.html
     tags-sorter: alpha
     operations-sorter: alpha
+
+# ============================================
+# AWS S3 설정 (환경변수 필수!)
+# ============================================
+aws:
+  s3:
+    region: ${AWS_S3_REGION:ap-northeast-2}
+    bucket: ${AWS_S3_BUCKET:}
+    access-key: ${AWS_ACCESS_KEY:}
+    secret-key: ${AWS_SECRET_KEY:}
+    base-url: ${AWS_S3_BASE_URL:https://${aws.s3.bucket}.s3.${aws.s3.region}.amazonaws.com}

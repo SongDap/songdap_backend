@@ -57,6 +57,14 @@ spring:
       password: ${REDIS_PASSWORD:}
       timeout: 6000ms
 
+  # ============================================
+  # Multipart 파일 업로드 설정
+  # ============================================
+  servlet:
+    multipart:
+      max-file-size: 10MB  # 개별 파일 최대 크기 (S3Service에서 10MB로 검증)
+      max-request-size: 10MB  # 전체 요청 최대 크기
+
 # ============================================
 # 로깅 설정
 # ============================================
@@ -107,3 +115,14 @@ springdoc:
     path: /swagger-ui.html
     tags-sorter: alpha
     operations-sorter: alpha
+
+# ============================================
+# AWS S3 설정
+# ============================================
+aws:
+  s3:
+    region: ${AWS_S3_REGION:ap-northeast-2}
+    bucket: ${AWS_S3_BUCKET:}
+    access-key: ${AWS_ACCESS_KEY:}
+    secret-key: ${AWS_SECRET_KEY:}
+    base-url: ${AWS_S3_BASE_URL:https://${aws.s3.bucket}.s3.${aws.s3.region}.amazonaws.com}
