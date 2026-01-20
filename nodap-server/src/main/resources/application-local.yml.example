@@ -69,3 +69,15 @@ oauth:
 # ============================================
 cors:
   allowed-origins: http://localhost:3000
+
+# ============================================
+# AWS S3 설정
+# ⚠️ AWS 자격 증명 정보를 입력하세요!
+# ============================================
+aws:
+  s3:
+    region: ap-northeast-2  # 서울 리전
+    bucket: your-s3-bucket-name  # S3 버킷 이름
+    access-key: YOUR_AWS_ACCESS_KEY  # AWS Access Key
+    secret-key: YOUR_AWS_SECRET_KEY  # AWS Secret Key
+    base-url: https://your-s3-bucket-name.s3.ap-northeast-2.amazonaws.com  # 또는 CloudFront URL
