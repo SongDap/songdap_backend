@@ -7,6 +7,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,6 +68,20 @@ public class GlobalExceptionHandler {
             HttpRequestMethodNotSupportedException e) {
         log.warn("HttpRequestMethodNotSupportedException: {}", e.getMessage());
         ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, e.getMessage());
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
+     * 파일 크기 초과 예외 처리
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    protected ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(
+            MaxUploadSizeExceededException e) {
+        log.warn("MaxUploadSizeExceededException: {}", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                ErrorCode.INVALID_INPUT_VALUE, 
+                "파일 크기가 너무 큽니다. 최대 10MB까지 업로드 가능합니다."
+        );
         return ResponseEntity.badRequest().body(response);
     }
 
