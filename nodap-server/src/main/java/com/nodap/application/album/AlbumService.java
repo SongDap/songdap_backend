@@ -1,7 +1,6 @@
-package com.nodap.application.auth;
+package com.nodap.application.album;
 
 import com.nodap.domain.album.entity.Album;
-import com.nodap.domain.album.entity.Category;
 import com.nodap.domain.album.repository.AlbumRepository;
 import com.nodap.domain.album.type.AlbumSortType;
 import com.nodap.domain.user.entity.User;
@@ -15,8 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * 앨범의 CRUD

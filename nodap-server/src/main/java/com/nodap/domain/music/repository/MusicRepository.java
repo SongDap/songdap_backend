@@ -1,6 +1,8 @@
 package com.nodap.domain.music.repository;
 
 import com.nodap.domain.music.entity.Music;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,14 +31,15 @@ public interface MusicRepository extends JpaRepository<Music, Long> {
     /**
      * 앨범 ID로 수록곡 목록 조회 (삭제되지 않은 것만)
      */
-    @Query("SELECT m FROM Music m WHERE m.album.id = :albumId AND m.deletedAt IS NULL ORDER BY m.createdAt DESC")
-    List<Music> findByAlbumIdAndNotDeleted(@Param("albumId") Long albumId);
+    @Query("SELECT m FROM Music m WHERE m.album.id = :albumId AND m.deletedAt IS NULL")
+    Page<Music> findByAlbumIdAndNotDeleted(@Param("albumId") Long albumId, Pageable pageable);
 
     /**
      * 앨범의 수록곡 개수 조회
      */
     @Query("SELECT COUNT(m) FROM Music m WHERE m.album.id = :albumId AND m.deletedAt IS NULL")
     long countByAlbumIdAndNotDeleted(@Param("albumId") Long albumId);
+
 }
 
 

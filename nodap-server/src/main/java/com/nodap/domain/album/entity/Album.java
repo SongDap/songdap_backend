@@ -143,5 +143,4 @@ public class Album extends BaseTimeEntity {
         }
         return this.musicCount < this.musicCountLimit;
     }
-
 }
