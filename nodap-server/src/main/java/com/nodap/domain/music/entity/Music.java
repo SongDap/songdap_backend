@@ -61,6 +61,7 @@ public class Music extends BaseTimeEntity {
         this.message = message;
         this.url = url;
         this.writer = writer;
+        this.image = image;
 
         // 양방향 연관관계 설정
         if (album != null) {

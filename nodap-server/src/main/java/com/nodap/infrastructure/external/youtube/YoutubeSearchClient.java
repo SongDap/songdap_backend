@@ -15,7 +15,7 @@ public class YoutubeSearchClient implements MusicVideoSearchPort {
     @Override
     public String search(String artist, String title) {
 
-        String query = artist + " " + title + " official mv";
+        String query = artist + " " + title + " official music Video";
 
         YoutubeSearchResponse response = webClient.get()
                 .uri(uriBuilder -> uriBuilder

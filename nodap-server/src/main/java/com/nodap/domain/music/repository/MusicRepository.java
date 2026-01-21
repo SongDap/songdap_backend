@@ -40,6 +40,17 @@ public interface MusicRepository extends JpaRepository<Music, Long> {
     @Query("SELECT COUNT(m) FROM Music m WHERE m.album.id = :albumId AND m.deletedAt IS NULL")
     long countByAlbumIdAndNotDeleted(@Param("albumId") Long albumId);
 
+    /**
+     * 노래 삭제 가능 여부 조회
+     */
+    @Query("SELECT COUNT(m) > 0 FROM Music m JOIN m.album a " +
+            "WHERE m.uuid = :musicUuid AND a.deletedAt IS NULL AND a.user.id = :userId") // 추후에 노래 등록자도 가능하게 하고 싶으면 or m.writer.id = :userId 추가 가능
+    boolean canDeleteMusic(@Param("musicUuid") String musicUuid, @Param("userId") Long userId);
+
+    /**
+     * uuid로 노래 삭제
+     */
+    void deleteByUuid(String uuid);
 }
 
 

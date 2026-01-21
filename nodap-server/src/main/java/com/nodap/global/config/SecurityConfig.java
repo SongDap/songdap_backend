@@ -58,10 +58,13 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         
                         // 앨범 공개 조회 (비로그인 사용자도 접근 가능)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/albums/{uuid}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/albums/{albumUuid}/musics").permitAll()
                         
                         // 수록곡 추가 (비로그인 사용자도 가능 - 앨범 공유 링크로 접근)
-                        .requestMatchers(HttpMethod.POST, "/api/v1/albums/{uuid}/musics").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/albums/{albumUuid}/musics").permitAll()
+
+                        // 수록곡 상세 정보 조회 (비로그인 사용자도 가능)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/musics/{musicUuid}").permitAll()
                         
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()

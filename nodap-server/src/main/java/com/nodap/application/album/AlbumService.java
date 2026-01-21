@@ -62,7 +62,7 @@ public class AlbumService {
     }
 
     /**
-     * 앨범 정보 조회
+     * 앨범 상세 정보 조회
      */
     @Transactional(readOnly = true)
     public AlbumDetailResponse getAlbumByUuid(Long userId, String albumUuid){
