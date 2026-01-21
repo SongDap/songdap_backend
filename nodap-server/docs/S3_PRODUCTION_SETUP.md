@@ -390,6 +390,10 @@ AWS_ACCESS_KEY=AKIA...  # nodap-s3-prod 사용자의 Access Key (따옴표 없�
 AWS_SECRET_KEY=...      # nodap-s3-prod 사용자의 Secret Key (따옴표 없음)
 AWS_S3_BASE_URL=https://nodap-images.s3.ap-northeast-2.amazonaws.com
 
+# Swagger 설정 (HTTPS 필수!)
+SWAGGER_SERVER_URL=https://answerwithsong.com  # 실제 프로덕션 도메인
+SWAGGER_SERVER_DESCRIPTION=프로덕션 API 서버
+
 # ❌ 잘못된 방법: 따옴표 사용 (값에 따옴표가 포함됨)
 # AWS_ACCESS_KEY="AKIA..."  # 이렇게 하면 안 됨!
 # AWS_SECRET_KEY="..."      # 이렇게 하면 안 됨!
