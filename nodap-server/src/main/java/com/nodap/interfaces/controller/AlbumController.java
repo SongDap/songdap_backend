@@ -1,6 +1,6 @@
 package com.nodap.interfaces.controller;
 
-import com.nodap.application.auth.AlbumService;
+import com.nodap.application.album.AlbumService;
 import com.nodap.domain.album.type.AlbumSortType;
 import com.nodap.global.common.ApiResponse;
 import com.nodap.interfaces.dto.album.AlbumCreateRequest;
@@ -15,8 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "Album", description = "앨범 관련 API")
 @RestController

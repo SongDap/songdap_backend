@@ -51,6 +51,14 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
      */
     @Query("SELECT COUNT(a) FROM Album a WHERE a.user.id = :userId AND a.deletedAt IS NULL")
     long countByUserIdAndNotDeleted(@Param("userId") Long userId);
+
+    /**
+     *  앨범의 소유주인지 조회
+     */
+    @Query("SELECT COUNT(a) > 0 FROM Album a " +
+            "WHERE a.uuid = :albumUuid AND a.user.id = :userId AND a.deletedAt IS NULL")
+    boolean isOwner(@Param("albumUuid") String albumUuid, @Param("userId") Long userId);
+
 }
 
 

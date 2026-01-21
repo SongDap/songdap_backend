@@ -9,4 +9,5 @@ public class AlbumListResponse {
     private String uuid;
     private String title;
     private String color;
+
 }
