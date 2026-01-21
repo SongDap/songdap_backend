@@ -160,6 +160,8 @@ oauth:
 | `KAKAO_CLIENT_SECRET` | 카카오 Client Secret | ❌ | (없음) |
 | `KAKAO_REDIRECT_URI` | 카카오 리다이렉트 URI | ✅ | - |
 | `CORS_ALLOWED_ORIGINS` | 허용할 Origin (쉼표 구분) | ✅ | - |
+| `SWAGGER_SERVER_URL` | Swagger 서버 URL (HTTPS) | ❌ | https://answerwithsong.com |
+| `SWAGGER_SERVER_DESCRIPTION` | Swagger 서버 설명 | ❌ | 프로덕션 API 서버 |
 
 ### JWT 설정
 

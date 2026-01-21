@@ -207,6 +207,10 @@ JPA_SHOW_SQL=false
 LOG_LEVEL_ROOT=WARN
 LOG_LEVEL_APP=INFO
 LOG_LEVEL_SQL=WARN
+
+# Swagger 설정 (HTTPS 필수!)
+SWAGGER_SERVER_URL=https://answerwithsong.com
+SWAGGER_SERVER_DESCRIPTION=프로덕션 API 서버
 ```
 
 **보안 설정:**
