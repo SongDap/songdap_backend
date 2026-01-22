@@ -65,6 +65,13 @@ public class User extends BaseTimeEntity {
     }
 
     /**
+     * 이메일 변경
+     */
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
+    /**
      * OAuth 계정 연결
      */
     public void linkOauthAccount(UserOauthAccount oauthAccount) {
