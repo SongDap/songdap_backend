@@ -68,8 +68,21 @@
 - ✅ `LoginResponse` - 로그인 응답 DTO
 - ✅ `HealthController` - 헬스체크 API
 
-### 9. Flyway (DB 마이그레이션)
+### 9. User API (4개)
+- ✅ `UserService` - 사용자 서비스 (정보 조회, 수정, 닉네임 중복 확인, 회원 탈퇴)
+- ✅ `UserController` - 사용자 컨트롤러
+  - `GET /api/v1/users/me` - 내 정보 조회
+  - `PATCH /api/v1/users/me` - 내 정보 수정 (닉네임, 이메일, 프로필 이미지)
+  - `GET /api/v1/users/check-nickname` - 닉네임 중복 확인
+  - `DELETE /api/v1/users` - 회원 탈퇴 (Soft Delete)
+- ✅ `UserInfoResponse` - 사용자 정보 응답 DTO
+- ✅ `UpdateUserRequest` - 사용자 정보 수정 요청 DTO
+- ✅ `CheckNicknameResponse` - 닉네임 중복 확인 응답 DTO
+
+### 10. Flyway (DB 마이그레이션)
 - ✅ `V1__init.sql` - 초기 스키마 (users, user_oauth_accounts, albums, musics)
+- ✅ `V2__album_add_column.sql` - 앨범 컬럼 추가 및 users email NULL 허용
+- ✅ `V3__delete_x_y_cardLength_from_musics.sql` - musics 테이블 컬럼 삭제
 
 ### 10. 배포 준비
 - ✅ `docs/BACKEND_DEPLOYMENT_GUIDE.md` - 배포 가이드
@@ -80,10 +93,10 @@
 
 ## 🚧 다음에 해야 할 작업
 
-### Phase 1: User API
-- [ ] `UserController` - 내 정보 조회, 닉네임 수정, 프로필 이미지 수정
-- [ ] `UserService` - 사용자 비즈니스 로직
-- [ ] User DTO 작성
+### Phase 1: User API ✅ 완료
+- [x] `UserController` - 내 정보 조회, 수정, 닉네임 중복 확인, 회원 탈퇴
+- [x] `UserService` - 사용자 비즈니스 로직
+- [x] User DTO 작성
 
 ### Phase 2: Album API (앨범 CRUD)
 - [ ] `AlbumController` - 앨범 목록, 상세, 생성, 수정, 삭제
@@ -111,8 +124,14 @@
 nodap-server/
 ├── src/main/java/com/nodap/
 │   ├── application/           # 애플리케이션 서비스 계층
-│   │   └── auth/
-│   │       └── AuthService.java
+│   │   ├── auth/
+│   │   │   └── AuthService.java
+│   │   ├── user/
+│   │   │   └── UserService.java
+│   │   ├── album/
+│   │   │   └── AlbumService.java
+│   │   └── music/
+│   │       └── MusicService.java
 │   ├── domain/               # 도메인 계층
 │   │   ├── album/
 │   │   │   ├── entity/       # Album, Category
@@ -132,7 +151,15 @@ nodap-server/
 │   │   └── external/         # 외부 API (카카오)
 │   ├── interfaces/           # 인터페이스 계층
 │   │   ├── controller/       # REST API 컨트롤러
+│   │   │   ├── AuthController.java
+│   │   │   ├── UserController.java
+│   │   │   ├── AlbumController.java
+│   │   │   └── MusicController.java
 │   │   └── dto/              # 요청/응답 DTO
+│   │       ├── auth/
+│   │       ├── user/
+│   │       ├── album/
+│   │       └── music/
 │   └── NodapServerApplication.java
 ├── src/main/resources/
 │   ├── db/migration/         # Flyway 마이그레이션 스크립트
@@ -176,12 +203,13 @@ cors:
 | POST | `/api/v1/auth/logout` | 로그아웃 | ❌ (쿠키) |
 | GET | `/api/v1/health` | 헬스체크 | ❌ |
 
-### User API (예정)
+### User API (완료)
 | Method | Endpoint | 설명 | 인증 |
 |--------|----------|------|------|
 | GET | `/api/v1/users/me` | 내 정보 조회 | ✅ |
-| PATCH | `/api/v1/users/me/nickname` | 닉네임 수정 | ✅ |
-| PATCH | `/api/v1/users/me/profile-image` | 프로필 이미지 수정 | ✅ |
+| PATCH | `/api/v1/users/me` | 내 정보 수정 (닉네임, 이메일, 프로필 이미지) | ✅ |
+| GET | `/api/v1/users/check-nickname` | 닉네임 중복 확인 | ✅ |
+| DELETE | `/api/v1/users` | 회원 탈퇴 (Soft Delete) | ✅ |
 
 ### Album API (예정)
 | Method | Endpoint | 설명 | 인증 |
