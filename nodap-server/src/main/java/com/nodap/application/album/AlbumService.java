@@ -6,6 +6,7 @@ import com.nodap.domain.album.type.AlbumSortType;
 import com.nodap.domain.user.entity.User;
 import com.nodap.domain.user.repository.UserRepository;
 import com.nodap.interfaces.dto.album.AlbumCreateRequest;
+import com.nodap.interfaces.dto.album.AlbumCreateResponse;
 import com.nodap.interfaces.dto.album.AlbumDetailResponse;
 import com.nodap.interfaces.dto.album.AlbumListResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class AlbumService {
      * 앨범 생성
      */
     @Transactional
-    public void createAlbum(Long userId, AlbumCreateRequest request){
+    public AlbumCreateResponse createAlbum(Long userId, AlbumCreateRequest request){
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
 
         Album album = Album.builder()
@@ -43,6 +44,7 @@ public class AlbumService {
                 .build();
 
         albumRepository.save(album);
+        return new AlbumCreateResponse(album.getUuid());
     }
 
     /**

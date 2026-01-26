@@ -95,7 +95,8 @@ public class MusicController {
 
                     - 로그인 없이 호출 가능합니다.
                     - 앨범 UUID 기준으로 노래 목록을 반환합니다.
-                    - 응답에는 노래 리스트와 마지막 페이지 번호(lastPageNo)가 포함됩니다.
+                    - LATEST: 최신순, OLDEST: 오래된 순, TITLE: 제목순, ARTIST: 가수순
+                    - 응답에는 노래 리스트  페이지 정보가 포함됩니다.
                     """
     )
     @ApiResponses({
@@ -128,7 +129,7 @@ public class MusicController {
             특정 노래의 상세 정보를 조회합니다.
 
             - 로그인 없이 호출 가능합니다.
-            - 로그인한 경우, 삭제 가능 여부(canDelete)가 함께 반환됩니다.
+            - 앨범 소유자 여부(isOwner)와 삭제 가능 여부(canDelete)가 함께 반환됩니다.
             - 노래 UUID 기준으로 조회됩니다.
             """
     )
