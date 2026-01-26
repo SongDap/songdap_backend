@@ -4,6 +4,7 @@ import com.nodap.application.album.AlbumService;
 import com.nodap.domain.album.type.AlbumSortType;
 import com.nodap.global.common.ApiResponse;
 import com.nodap.interfaces.dto.album.AlbumCreateRequest;
+import com.nodap.interfaces.dto.album.AlbumCreateResponse;
 import com.nodap.interfaces.dto.album.AlbumDetailResponse;
 import com.nodap.interfaces.dto.album.AlbumListResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,11 +52,11 @@ public class AlbumController {
             )
     })
     @PostMapping()
-    public ResponseEntity<ApiResponse<Void>> createAlbum(
+    public ResponseEntity<ApiResponse<AlbumCreateResponse>> createAlbum(
             @AuthenticationPrincipal Long userId,
             @Valid @RequestBody AlbumCreateRequest request){
-        albumService.createAlbum(userId, request);
-        return ResponseEntity.ok(ApiResponse.success("앨범 생성 성공"));
+        AlbumCreateResponse response = albumService.createAlbum(userId, request);
+        return ResponseEntity.ok(ApiResponse.success("앨범 생성 성공", response));
     }
 
     /**
