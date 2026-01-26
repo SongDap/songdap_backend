@@ -14,10 +14,6 @@ public record UpdateUserRequest(
 
         @Schema(description = "이메일 (선택)", example = "dev@example.com")
         @Size(max = 128, message = "이메일은 128자 이하여야 합니다.")
-        String email,
-
-        @Schema(description = "프로필 이미지 URL (선택)", example = "https://example.com/profile.jpg")
-        @Size(max = 256, message = "프로필 이미지 URL은 256자 이하여야 합니다.")
-        String profileImage
+        String email
 ) {
 }

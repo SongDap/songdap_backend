@@ -1,11 +1,16 @@
 package com.nodap.interfaces.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nodap.application.user.UserService;
 import com.nodap.global.common.ApiResponse;
+import com.nodap.infrastructure.external.S3Folder;
+import com.nodap.infrastructure.external.S3Service;
 import com.nodap.interfaces.dto.user.CheckNicknameResponse;
 import com.nodap.interfaces.dto.user.UpdateUserRequest;
 import com.nodap.interfaces.dto.user.UserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -13,9 +18,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 /**
  * 사용자 API 컨트롤러
@@ -27,6 +36,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final ObjectMapper objectMapper;
+    private final S3Service s3Service;
 
     /**
      * 내 정보 조회
@@ -69,6 +80,7 @@ public class UserController {
             
             - 로그인한 사용자만 호출 가능합니다.
             - 닉네임은 필수이며, 이메일과 프로필 이미지는 선택입니다.
+            - 프로필 이미지는 MultipartFile로 업로드하며, S3에 저장됩니다.
             - 닉네임 중복 시 에러가 발생합니다.
             """)
     @ApiResponses({
@@ -94,12 +106,27 @@ public class UserController {
                     description = "USER_002: 이미 사용 중인 닉네임입니다."
             )
     })
-    @PatchMapping("/me")
+    @PatchMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<UserInfoResponse>> updateMyInfo(
             @AuthenticationPrincipal Long userId,
-            @Valid @RequestBody UpdateUserRequest request) {
+            @Valid @RequestPart("request") String requestJson,
+            @Parameter(description = "프로필 이미지 파일 (jpg, jpeg, png, gif, webp, 최대 10MB)", 
+                       content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+            @RequestPart(value = "file", required = false) @Schema(type = "string", format = "binary") MultipartFile file) throws IOException {
         
-        UserInfoResponse userInfo = userService.updateMyInfo(userId, request);
+        UpdateUserRequest request;
+        try {
+            request = objectMapper.readValue(requestJson, UpdateUserRequest.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("request는 올바른 JSON 형식이어야 합니다.");
+        }
+        
+        String profileImageUrl = null;
+        if (file != null && !file.isEmpty()) {
+            profileImageUrl = s3Service.uploadImage(file, S3Folder.USER_PROFILE);
+        }
+        
+        UserInfoResponse userInfo = userService.updateMyInfo(userId, request, profileImageUrl);
         
         return ResponseEntity.ok(ApiResponse.success("사용자 정보 수정 성공", userInfo));
     }

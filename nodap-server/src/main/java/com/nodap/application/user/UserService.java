@@ -51,7 +51,7 @@ public class UserService {
      * 현재 로그인한 사용자 정보 수정
      */
     @Transactional
-    public UserInfoResponse updateMyInfo(Long userId, UpdateUserRequest request) {
+    public UserInfoResponse updateMyInfo(Long userId, UpdateUserRequest request, String profileImageUrl) {
         log.info("[User] 사용자 정보 수정: userId={}, nickname={}, email={}", 
                 userId, request.nickname(), request.email());
 
@@ -75,8 +75,8 @@ public class UserService {
             user.updateEmail(request.email());
         }
         
-        if (request.profileImage() != null && !request.profileImage().isBlank()) {
-            user.updateProfileImage(request.profileImage());
+        if (profileImageUrl != null && !profileImageUrl.isBlank()) {
+            user.updateProfileImage(profileImageUrl);
         }
 
         userRepository.save(user);
