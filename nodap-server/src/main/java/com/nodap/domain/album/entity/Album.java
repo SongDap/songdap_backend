@@ -57,8 +57,6 @@ public class Album extends BaseTimeEntity {
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Music> musics = new ArrayList<>();
 
-    private LocalDateTime deletedAt;
-
     @Builder
     public Album(User user, String title, String description, String color, String cover, Boolean isPublic, Integer musicCountLimit) {
         this.uuid = UUID.randomUUID().toString();
