@@ -1,0 +1,42 @@
+# ============================================
+# 루트 레벨 .gitignore
+# ============================================
+
+# 빌드 산출물
+build/
+bin/
+out/
+*.jar
+*.war
+*.ear
+
+# IDE 설정
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS 파일
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 로그 파일
+*.log
+logs/
+
+# 임시 파일
+*.tmp
+*.swp
+*~
+
+# 환경 변수 파일
+.env
+.env.local
+.env.*.local
+
+# 민감 정보
+*.pem
+*.key
+*.p12

@@ -29,35 +29,45 @@
 | **API 문서** | Swagger (SpringDoc OpenAPI) |
 | **Build** | Gradle |
 | **Container** | Docker, Docker Compose |
+| **Infrastructure** | AWS EC2, CodeDeploy, S3 |
 
 ---
 
 ## 📁 프로젝트 구조
 
 ```
-nodap-server/
-├── src/main/java/com/nodap/
-│   ├── application/           # 애플리케이션 서비스 (UseCase)
-│   ├── domain/               # 도메인 (Entity, Repository)
-│   │   ├── album/
-│   │   ├── music/
-│   │   └── user/
-│   ├── global/               # 전역 설정, 공통 모듈
-│   │   ├── common/           # ApiResponse, BaseTimeEntity
-│   │   ├── config/           # Security, Swagger 등
-│   │   └── error/            # 예외 처리
-│   ├── infrastructure/       # 인프라 (JWT, 외부 API)
-│   │   ├── auth/
-│   │   └── external/
-│   └── interfaces/           # 인터페이스 (Controller, DTO)
-│       ├── controller/
-│       └── dto/
-├── src/main/resources/
-│   ├── db/migration/              # Flyway 마이그레이션
-│   ├── application.yml            # 공통 설정
-│   ├── application-local.yml.example  # 로컬 설정 예시 (복사해서 사용)
-│   └── application-prod.yml       # 프로덕션 설정
-└── build.gradle
+songdap_backend/
+├── infra/                      # 인프라 관련 파일
+│   └── docker/
+│       └── docker-compose.yml  # 로컬 개발용 Docker Compose
+├── nodap-server/
+│   ├── src/main/java/com/nodap/
+│   │   ├── application/           # 애플리케이션 서비스 (UseCase)
+│   │   ├── domain/               # 도메인 (Entity, Repository)
+│   │   │   ├── album/
+│   │   │   ├── music/
+│   │   │   └── user/
+│   │   ├── global/               # 전역 설정, 공통 모듈
+│   │   │   ├── common/           # ApiResponse, BaseTimeEntity
+│   │   │   ├── config/           # Security, Swagger 등
+│   │   │   └── error/            # 예외 처리
+│   │   ├── infrastructure/       # 인프라 (JWT, 외부 API)
+│   │   │   ├── auth/
+│   │   │   └── external/
+│   │   └── interfaces/           # 인터페이스 (Controller, DTO)
+│   │       ├── controller/
+│   │       └── dto/
+│   ├── src/main/resources/
+│   │   ├── db/migration/              # Flyway 마이그레이션
+│   │   ├── application.yml            # 공통 설정
+│   │   ├── application-local.yml.example  # 로컬 설정 예시 (복사해서 사용)
+│   │   └── application-prod.yml       # 프로덕션 설정
+│   ├── scripts/                 # 배포 스크립트
+│   │   ├── deploy.sh
+│   │   └── ec2-init-setup.sh
+│   ├── appspec.yml              # AWS CodeDeploy 설정
+│   └── build.gradle
+└── README.md
 ```
 
 ---
@@ -73,13 +83,13 @@ nodap-server/
 
 ```bash
 # 프로젝트 루트에서 실행
-docker-compose up -d
+docker-compose -f infra/docker/docker-compose.yml up -d
 
 # 상태 확인
-docker-compose ps
+docker-compose -f infra/docker/docker-compose.yml ps
 
 # 중지
-docker-compose down
+docker-compose -f infra/docker/docker-compose.yml down
 ```
 
 #### ⚠️ Windows 포트 문제
