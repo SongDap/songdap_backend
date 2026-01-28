@@ -23,11 +23,11 @@ read -p "애플리케이션용 DB 사용자 비밀번호를 입력하세요: " N
 
 echo "데이터베이스와 사용자를 생성합니다..."
 sudo mysql -u root -p${MYSQL_ROOT_PASS} <<EOF
-CREATE DATABASE IF NOT EXISTS nodap CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'nodap_user'@'localhost' IDENTIFIED BY '${NODAP_DB_PASS}';
-CREATE USER IF NOT EXISTS 'nodap_user'@'%' IDENTIFIED BY '${NODAP_DB_PASS}';
-GRANT ALL PRIVILEGES ON nodap.* TO 'nodap_user'@'localhost';
-GRANT ALL PRIVILEGES ON nodap.* TO 'nodap_user'@'%';
+CREATE DATABASE IF NOT EXISTS nodap_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'nodap_admin'@'localhost' IDENTIFIED BY '${NODAP_DB_PASS}';
+CREATE USER IF NOT EXISTS 'nodap_admin'@'%' IDENTIFIED BY '${NODAP_DB_PASS}';
+GRANT ALL PRIVILEGES ON nodap_db.* TO 'nodap_admin'@'localhost';
+GRANT ALL PRIVILEGES ON nodap_db.* TO 'nodap_admin'@'%';
 FLUSH PRIVILEGES;
 EOF
 
@@ -65,28 +65,66 @@ fi
 
 # 3. 애플리케이션 디렉토리 생성
 echo -e "${YELLOW}[3/6] 애플리케이션 디렉토리 생성${NC}"
-mkdir -p ~/nodap-server/{logs,backup,config}
-chmod 755 ~/nodap-server
-chmod 755 ~/nodap-server/logs
-chmod 755 ~/nodap-server/backup
+mkdir -p /home/ubuntu/backend
+mkdir -p /home/ubuntu/config
+mkdir -p /home/ubuntu/backup
+chmod 755 /home/ubuntu/backend
+chmod 755 /home/ubuntu/config
+chmod 755 /home/ubuntu/backup
 echo -e "${GREEN}✅ 디렉토리 생성 완료${NC}"
 
 # 4. 환경 변수 파일 생성
 echo -e "${YELLOW}[4/6] 환경 변수 파일 생성${NC}"
-cat > ~/nodap-server/config/.env <<EOF
+read -p "JWT Secret 키를 입력하세요 (32자 이상): " JWT_SECRET
+read -p "카카오 OAuth Client ID를 입력하세요: " KAKAO_CLIENT_ID
+read -p "카카오 OAuth Client Secret을 입력하세요: " KAKAO_CLIENT_SECRET
+read -p "카카오 OAuth Redirect URI를 입력하세요 (기본값: https://answerwithsong.com/oauth/kakao/callback): " KAKAO_REDIRECT_URI
+KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI:-https://answerwithsong.com/oauth/kakao/callback}
+
+cat > /home/ubuntu/config/.env <<EOF
+# 프로덕션 프로파일
 SPRING_PROFILES_ACTIVE=prod
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=nodap
-DB_USERNAME=nodap_user
-DB_PASSWORD=${NODAP_DB_PASS}
+
+# Swagger 설정
+SWAGGER_SERVER_URL=https://answerwithsong.com
+SWAGGER_SERVER_DESCRIPTION=프로덕션 API 서버
+
+# MySQL 설정
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_NAME=nodap_db
+MYSQL_USERNAME=nodap_admin
+MYSQL_PASSWORD=${NODAP_DB_PASS}
+
+# JWT 설정
+JWT_SECRET=${JWT_SECRET}
+JWT_ACCESS_EXPIRY=1800000
+JWT_REFRESH_EXPIRY=604800000
+
+# Redis 설정
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=${REDIS_PASS}
+
+# CORS 설정
+CORS_ALLOWED_ORIGINS=https://answerwithsong.com
+
+# 카카오 OAuth 설정
+KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
+KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
+KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
+
+# AWS S3 설정 (나중에 추가 필요)
+# AWS_S3_REGION=ap-northeast-2
+# AWS_S3_BUCKET=nodap-images
+# AWS_ACCESS_KEY=your-access-key
+# AWS_SECRET_KEY=your-secret-key
+# AWS_S3_BASE_URL=https://nodap-images.s3.ap-northeast-2.amazonaws.com
 EOF
 
-chmod 600 ~/nodap-server/config/.env
+chmod 600 /home/ubuntu/config/.env
 echo -e "${GREEN}✅ 환경 변수 파일 생성 완료${NC}"
+echo -e "${YELLOW}⚠️  AWS S3 설정은 나중에 수동으로 추가하세요${NC}"
 
 # 5. systemd 서비스 파일 생성
 echo -e "${YELLOW}[5/6] systemd 서비스 파일 생성${NC}"
@@ -97,11 +135,11 @@ After=network.target mysql.service redis-server.service
 
 [Service]
 Type=simple
-User=${USER}
-Group=${USER}
-WorkingDirectory=/home/${USER}/nodap-server
-EnvironmentFile=/home/${USER}/nodap-server/config/.env
-ExecStart=/usr/bin/java -jar /home/${USER}/nodap-server/nodap-server.jar
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/backend
+EnvironmentFile=/home/ubuntu/config/.env
+ExecStart=/usr/bin/java -jar -Dspring.profiles.active=prod -Dserver.port=8080 /home/ubuntu/backend/nodap-server.jar
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -139,7 +177,7 @@ echo -e "${GREEN}========================================${NC}"
 echo ""
 echo "📋 다음 단계:"
 echo "1. 로컬에서 JAR 파일 빌드: ./gradlew build -x test"
-echo "2. EC2로 JAR 파일 업로드: scp -i key.pem build/libs/nodap-server-*.jar ubuntu@13.209.40.98:~/nodap-server/nodap-server.jar"
+echo "2. EC2로 JAR 파일 업로드: scp -i key.pem build/libs/nodap-server-*.jar ubuntu@3.37.205.227:/home/ubuntu/backend/nodap-server.jar"
 echo "3. 서비스 시작: sudo systemctl start nodap"
 echo "4. 로그 확인: sudo journalctl -u nodap -f"
 echo ""

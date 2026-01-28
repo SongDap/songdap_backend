@@ -225,8 +225,6 @@ EC2 서버에 SSH 접속 후:
 
 ```bash
 # 환경 변수 파일 편집
-nano ~/nodap-server/config/.env
-# 또는
 nano /home/ubuntu/config/.env
 ```
 
@@ -371,7 +369,7 @@ EC2 서버에 SSH 접속 후:
 
 ```bash
 # 환경 변수 파일 생성
-sudo nano ~/nodap-server/config/.env
+sudo nano /home/ubuntu/config/.env
 ```
 
 ### 3-2. S3 관련 환경 변수 추가
@@ -408,7 +406,7 @@ SWAGGER_SERVER_DESCRIPTION=프로덕션 API 서버
 
 ```bash
 # 민감 정보이므로 권한 제한
-chmod 600 ~/nodap-server/config/.env
+chmod 600 /home/ubuntu/config/.env
 ```
 
 ### 3-4. systemd 서비스 파일 업데이트
@@ -422,22 +420,19 @@ sudo systemctl show nodap | grep EnvironmentFile
 # 경로가 /home/ubuntu/config/.env로 되어 있다면 수정 필요!
 ```
 
-**경로 수정 방법:**
+**경로 확인:**
 
 ```bash
-# 방법 1: 자동 수정 (권장)
-sudo sed -i 's|EnvironmentFile=/home/ubuntu/config/.env|EnvironmentFile=/home/ubuntu/nodap-server/config/.env|' /etc/systemd/system/nodap.service
-
-# 방법 2: 수동 수정
-sudo nano /etc/systemd/system/nodap.service
+# systemd 서비스 파일 확인
+sudo cat /etc/systemd/system/nodap.service
 ```
 
 **올바른 설정:**
 
 ```ini
 [Service]
-EnvironmentFile=/home/ubuntu/nodap-server/config/.env
-ExecStart=/usr/bin/java -jar /home/ubuntu/nodap-server/nodap-server.jar
+EnvironmentFile=/home/ubuntu/config/.env
+ExecStart=/usr/bin/java -jar -Dspring.profiles.active=prod -Dserver.port=8080 /home/ubuntu/backend/nodap-server.jar
 ```
 
 **수정 확인:**
@@ -482,7 +477,7 @@ sudo journalctl -u nodap -f | grep --line-buffered "S3 Config"
 **방법 3: 로그 파일 직접 확인**
 ```bash
 # 로그 파일 확인
-tail -n 100 ~/nodap-server/logs/application.log | grep "S3 Config"
+sudo journalctl -u nodap -n 100 | grep "S3 Config"
 ```
 
 다음 메시지가 보여야 합니다:
@@ -575,10 +570,10 @@ curl -I https://nodap-images.s3.ap-northeast-2.amazonaws.com/albums/cover/uuid.p
    sudo systemctl show nodap | grep EnvironmentFile
    
    # 환경 변수 파일 내용 확인
-   cat ~/nodap-server/config/.env | grep AWS
+   cat /home/ubuntu/config/.env | grep AWS
    
    # 수동으로 환경 변수 로드 테스트
-   source ~/nodap-server/config/.env
+   source /home/ubuntu/config/.env
    echo $AWS_ACCESS_KEY
    echo $AWS_SECRET_KEY
    ```
@@ -608,7 +603,7 @@ curl -I https://nodap-images.s3.ap-northeast-2.amazonaws.com/albums/cover/uuid.p
 sudo systemctl show nodap | grep EnvironmentFile
 
 # 수동으로 환경 변수 로드 테스트
-source ~/nodap-server/config/.env
+source /home/ubuntu/config/.env
 echo $AWS_ACCESS_KEY
 ```
 

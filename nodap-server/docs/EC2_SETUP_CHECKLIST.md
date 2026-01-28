@@ -121,17 +121,13 @@ SHOW DATABASES;
 
 -- 사용자 목록 확인
 SELECT user, host FROM mysql.user;
--- nodap_admin 또는 nodap_user가 있어야 함
+-- nodap_admin이 있어야 함
 
 -- 권한 확인
 SHOW GRANTS FOR 'nodap_admin'@'%';
--- 또는
-SHOW GRANTS FOR 'nodap_user'@'%';
 
 -- 데이터베이스 접속 테스트
 USE nodap_db;
--- 또는
-USE nodap;
 
 -- 테이블 목록 확인
 SHOW TABLES;
@@ -142,7 +138,7 @@ EXIT;
 
 **예상 결과:**
 - 데이터베이스: `nodap_db` 존재
-- 사용자: `nodap_admin@%` 또는 `nodap_user@%` 존재
+- 사용자: `nodap_admin@%` 존재
 - 테이블: `users`, `albums`, `musics`, `user_oauth_accounts`, `flyway_schema_history`
 
 ---
