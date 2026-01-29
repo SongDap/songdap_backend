@@ -5,10 +5,7 @@ import com.nodap.domain.album.repository.AlbumRepository;
 import com.nodap.domain.album.type.AlbumSortType;
 import com.nodap.domain.user.entity.User;
 import com.nodap.domain.user.repository.UserRepository;
-import com.nodap.interfaces.dto.album.AlbumCreateRequest;
-import com.nodap.interfaces.dto.album.AlbumCreateResponse;
-import com.nodap.interfaces.dto.album.AlbumDetailResponse;
-import com.nodap.interfaces.dto.album.AlbumListResponse;
+import com.nodap.interfaces.dto.album.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -97,5 +94,21 @@ public class AlbumService {
         }
 
         album.delete();
+    }
+
+    /**
+     * 앨범 수정
+     */
+    @Transactional
+    public AlbumVisibilityResponse toggleAlbumVisibility(Long userId, String albumUuid){
+        Album album = albumRepository.findByUuidAndNotDeleted(albumUuid)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 앨범"));
+
+        if (!album.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("앨범 삭제 권한이 없습니다.");
+        }
+
+        album.updateIsPublic(!album.getIsPublic());
+        return new AlbumVisibilityResponse(album.getIsPublic());
     }
 }
