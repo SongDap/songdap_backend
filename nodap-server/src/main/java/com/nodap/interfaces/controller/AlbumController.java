@@ -3,10 +3,7 @@ package com.nodap.interfaces.controller;
 import com.nodap.application.album.AlbumService;
 import com.nodap.domain.album.type.AlbumSortType;
 import com.nodap.global.common.ApiResponse;
-import com.nodap.interfaces.dto.album.AlbumCreateRequest;
-import com.nodap.interfaces.dto.album.AlbumCreateResponse;
-import com.nodap.interfaces.dto.album.AlbumDetailResponse;
-import com.nodap.interfaces.dto.album.AlbumListResponse;
+import com.nodap.interfaces.dto.album.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -164,5 +161,41 @@ public class AlbumController {
         albumService.deleteAlbum(userId, albumUuid);
 
         return ResponseEntity.ok(ApiResponse.success("앨범 삭제 성공"));
+    }
+
+    /**
+     * 앨범 공개/비공개 전환
+     */
+    @Operation(
+            summary = "앨범 공개/비공개 전환",
+            description = """
+                앨범 UUID를 이용해 앨범의 공개 상태를 전환합니다.
+
+                - 본인이 생성한 앨범만 변경할 수 있습니다.
+                - 공개 → 비공개, 비공개 → 공개로 토글됩니다.
+                """
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "앨범 공개 상태 변경 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "앨범 수정 권한 없음"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "앨범을 찾을 수 없음"
+            )
+    })
+    @PatchMapping("/{albumUuid}/visibility")
+    public ResponseEntity<ApiResponse<AlbumVisibilityResponse>> toggleAlbumVisibility(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String albumUuid
+    ) {
+        AlbumVisibilityResponse response = albumService.toggleAlbumVisibility(userId, albumUuid);
+
+        return ResponseEntity.ok(ApiResponse.success("앨범 공개 상태 변경 성공", response));
     }
 }
