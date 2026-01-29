@@ -38,26 +38,14 @@ public record S3Properties(
             region = "ap-northeast-2";
         }
         
-        // 자격 증명 검증
-        if (accessKey == null || accessKey.isBlank()) {
-            throw new IllegalArgumentException(
-                "AWS Access Key가 설정되지 않았습니다. " +
-                "환경 변수 AWS_ACCESS_KEY 또는 application-local.yml의 aws.s3.access-key를 설정하세요."
-            );
-        }
-        
-        if (secretKey == null || secretKey.isBlank()) {
-            throw new IllegalArgumentException(
-                "AWS Secret Key가 설정되지 않았습니다. " +
-                "환경 변수 AWS_SECRET_KEY 또는 application-local.yml의 aws.s3.secret-key를 설정하세요."
-            );
-        }
-        
+        // 버킷 검증 (버킷 정보는 반드시 필요)
         if (bucket == null || bucket.isBlank()) {
             throw new IllegalArgumentException(
                 "S3 버킷 이름이 설정되지 않았습니다. " +
                 "환경 변수 AWS_S3_BUCKET 또는 application-local.yml의 aws.s3.bucket을 설정하세요."
             );
         }
+        // Note: accessKey/secretKey may be omitted when using IAM Role (Instance Profile) or
+        // DefaultCredentialsProvider. Do not enforce accessKey/secretKey here.
     }
 }
