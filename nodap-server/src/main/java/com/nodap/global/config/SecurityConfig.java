@@ -56,7 +56,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/dev/**").permitAll()  // 개발용 API (local 프로필에서만 활성화)
                         .requestMatchers("/api/v1/health").permitAll()
                         .requestMatchers("/error").permitAll()
-                        
+
+                        // 앨범 상세 조회 (노래 목록 조회 페이지에서도 사용)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/albums/{albumUuid}").permitAll()
+
                         // 앨범 공개 조회 (비로그인 사용자도 접근 가능)
                         .requestMatchers(HttpMethod.GET, "/api/v1/albums/{albumUuid}/musics").permitAll()
                         
