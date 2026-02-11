@@ -36,7 +36,7 @@ public class MusicService {
 
     private final S3Service s3Service;
     private static final String DEFAULT_IMAGE_URL =
-            "https://images.unsplash.com/photo-1548199973-03cce0bbc87b";
+            "https://nodap-images.s3.ap-northeast-2.amazonaws.com/songs/f2480cd9-6dfb-475e-90f4-d31a7ee052d7.png";
 
     /**
      * 노래 등록
@@ -52,12 +52,15 @@ public class MusicService {
             throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
 
+        if(album.getMusicCountLimit()<=album.getMusicCount()){
+            throw new BusinessException(ErrorCode.MUSIC_LIMIT_EXCEEDED);
+        }
+
         String videoUrl = musicVideoSearchPort.search(request.getArtist(), request.getTitle());
 
         if (videoUrl == null || videoUrl.isBlank()) {
             videoUrl = "https://www.youtube.com";
         }
-        log.info("videoUrl = [{}]", videoUrl);
 
         String writer = request.getWriter();
         if(writer == null || writer.isBlank()){
@@ -93,6 +96,12 @@ public class MusicService {
             throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
 
+        boolean canAdd = !isOwner;
+
+        if(album.getMusicCount()>=album.getMusicCountLimit()){
+            canAdd = false;
+        }
+
         Page<MusicInfo> items =
                 musicRepository.findByAlbumIdAndNotDeleted(album.getId(), pageable)
                         .map(m -> new MusicInfo(
@@ -105,7 +114,7 @@ public class MusicService {
                                 m.getImage()
                         ));
 
-        MusicListResponse.Flag flag = new MusicListResponse.Flag(isOwner, isOwner, !isOwner);
+        MusicListResponse.Flag flag = new MusicListResponse.Flag(isOwner, isOwner, canAdd);
 
 
         return new MusicListResponse(flag, items);
