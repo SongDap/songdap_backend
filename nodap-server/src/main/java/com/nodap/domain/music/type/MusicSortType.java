@@ -18,7 +18,7 @@ public enum MusicSortType {
                 case LATEST -> Sort.by(Sort.Direction.DESC, "createdAt");
                 case OLDEST -> Sort.by(Sort.Direction.ASC, "createdAt");
                 case TITLE  -> Sort.by(Sort.Direction.ASC, "title");
-                case ARTIST -> Sort.by(Sort.Direction.DESC, "artist");
+                case ARTIST -> Sort.by(Sort.Direction.ASC, "artist");
             };
         }
 
