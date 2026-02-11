@@ -76,7 +76,7 @@ public class MusicController {
             throw new IllegalArgumentException("request는 올바른 JSON 형식이어야 합니다.");
         }
 
-        String imageUrl = "https://images.unsplash.com/photo-1548199973-03cce0bbc87b";
+        String imageUrl = "https://nodap-images.s3.ap-northeast-2.amazonaws.com/songs/f2480cd9-6dfb-475e-90f4-d31a7ee052d7.png";
 
         if(file != null && !file.isEmpty()){
             imageUrl = s3Service.uploadImage(file, S3Folder.SONGS);
