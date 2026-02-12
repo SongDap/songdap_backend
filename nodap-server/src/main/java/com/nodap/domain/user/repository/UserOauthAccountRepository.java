@@ -22,9 +22,18 @@ public interface UserOauthAccountRepository extends JpaRepository<UserOauthAccou
 
     /**
      * Provider와 ProviderId로 User와 함께 조회 (N+1 방지)
+     * 탈퇴한 회원(Soft Delete)은 제외 → 재가입 시 복구(restore) 후 신규 회원 플로우로 처리
      */
-    @Query("SELECT oa FROM UserOauthAccount oa JOIN FETCH oa.user WHERE oa.provider = :provider AND oa.providerId = :providerId")
+    @Query("SELECT oa FROM UserOauthAccount oa JOIN FETCH oa.user u WHERE oa.provider = :provider AND oa.providerId = :providerId AND oa.deletedAt IS NULL AND u.deletedAt IS NULL")
     Optional<UserOauthAccount> findByProviderAndProviderIdWithUser(
+            @Param("provider") Provider provider, 
+            @Param("providerId") String providerId);
+
+    /**
+     * Provider와 ProviderId로 조회 (탈퇴 포함, 재가입 시 복구용)
+     */
+    @Query("SELECT oa FROM UserOauthAccount oa JOIN FETCH oa.user u WHERE oa.provider = :provider AND oa.providerId = :providerId")
+    Optional<UserOauthAccount> findByProviderAndProviderIdWithUserIncludeDeleted(
             @Param("provider") Provider provider, 
             @Param("providerId") String providerId);
 

@@ -55,7 +55,7 @@ public class AuthService {
         // 2. 카카오 사용자 정보 조회
         KakaoUserInfo userInfo = kakaoOAuthClient.getUserInfo(tokenResponse.access_token());
 
-        // 3. 기존 회원 확인 또는 신규 회원 가입
+        // 3. 기존 회원 확인 / 탈퇴 후 재가입(복구) / 신규 회원 가입
         Optional<UserOauthAccount> existingOauthAccount = 
                 userOauthAccountRepository.findByProviderAndProviderIdWithUser(
                         Provider.KAKAO, userInfo.id());
@@ -64,15 +64,38 @@ public class AuthService {
         boolean isNewMember;
 
         if (existingOauthAccount.isPresent()) {
-            // 기존 회원
+            // 기존 회원 (미탈퇴)
             user = existingOauthAccount.get().getUser();
             isNewMember = false;
             log.info("[Auth] 기존 회원 로그인 성공: userId={}, kakaoId={}", user.getId(), userInfo.id());
         } else {
-            // 신규 회원 가입
-            user = createNewUser(userInfo);
-            isNewMember = true;
-            log.info("[Auth] 신규 회원 가입 완료: userId={}, kakaoId={}", user.getId(), userInfo.id());
+            // 탈퇴한 계정 복구 또는 신규 가입
+            Optional<UserOauthAccount> deletedAccount = 
+                    userOauthAccountRepository.findByProviderAndProviderIdWithUserIncludeDeleted(
+                            Provider.KAKAO, userInfo.id());
+            if (deletedAccount.isPresent()) {
+                UserOauthAccount oa = deletedAccount.get();
+                User deletedUser = oa.getUser();
+                if (oa.isDeleted() || deletedUser.isDeleted()) {
+                    // 탈퇴 후 재가입: 복구 후 회원가입 플로우(isNewMember=true)로 처리
+                    oa.restore();
+                    deletedUser.restore();
+                    userOauthAccountRepository.save(oa);
+                    userRepository.save(deletedUser);
+                    user = deletedUser;
+                    isNewMember = true;
+                    log.info("[Auth] 탈퇴 계정 복구 후 재가입: userId={}, kakaoId={}", user.getId(), userInfo.id());
+                } else {
+                    user = deletedUser;
+                    isNewMember = false;
+                    log.info("[Auth] 기존 회원 로그인 성공: userId={}, kakaoId={}", user.getId(), userInfo.id());
+                }
+            } else {
+                // 진짜 신규 회원 가입
+                user = createNewUser(userInfo);
+                isNewMember = true;
+                log.info("[Auth] 신규 회원 가입 완료: userId={}, kakaoId={}", user.getId(), userInfo.id());
+            }
         }
 
         // 4. JWT 토큰 발급 및 쿠키 설정
