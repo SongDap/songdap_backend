@@ -31,7 +31,12 @@ public record KakaoOAuthProperties(
         /**
          * 사용자 정보 조회 URI
          */
-        String userInfoUri
+        String userInfoUri,
+
+        /**
+         * 카카오 연동 해제 URI
+         */
+        String unlinkUri
 ) {
     public KakaoOAuthProperties {
         if (tokenUri == null) {
@@ -39,6 +44,9 @@ public record KakaoOAuthProperties(
         }
         if (userInfoUri == null) {
             userInfoUri = "https://kapi.kakao.com/v2/user/me";
+        }
+        if (unlinkUri == null) {
+            unlinkUri = "https://kapi.kakao.com/v1/user/unlink";
         }
     }
 }
