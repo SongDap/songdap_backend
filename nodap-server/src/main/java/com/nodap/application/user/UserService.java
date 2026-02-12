@@ -1,5 +1,6 @@
 package com.nodap.application.user;
 
+import com.nodap.domain.user.entity.Provider;
 import com.nodap.domain.user.entity.User;
 import com.nodap.domain.user.entity.UserOauthAccount;
 import com.nodap.domain.user.repository.UserOauthAccountRepository;
@@ -8,6 +9,7 @@ import com.nodap.global.error.BusinessException;
 import com.nodap.global.error.ErrorCode;
 import com.nodap.infrastructure.auth.CookieProvider;
 import com.nodap.infrastructure.auth.RefreshTokenRepository;
+import com.nodap.infrastructure.external.KakaoOAuthClient;
 import com.nodap.interfaces.dto.user.CheckNicknameResponse;
 import com.nodap.interfaces.dto.user.UpdateUserRequest;
 import com.nodap.interfaces.dto.user.UserInfoResponse;
@@ -30,6 +32,7 @@ public class UserService {
     private final UserOauthAccountRepository userOauthAccountRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final CookieProvider cookieProvider;
+    private final KakaoOAuthClient kakaoOAuthClient;
 
     /**
      * 현재 로그인한 사용자 정보 조회
@@ -120,20 +123,33 @@ public class UserService {
         refreshTokenRepository.deleteByUserId(userId);
         log.debug("[User] Refresh Token 삭제 완료: userId={}", userId);
 
-        // 2. OAuth 계정 삭제 (카카오 연동 해제)
+        // 2. 카카오 연동 해제 (카카오 API 호출)
         UserOauthAccount oauthAccount = user.getOauthAccount();
+        if (oauthAccount != null && oauthAccount.getProvider() == Provider.KAKAO) {
+            try {
+                kakaoOAuthClient.unlink(oauthAccount.getProviderId());
+                log.info("[User] 카카오 연동 해제 API 호출 완료: userId={}, providerId={}", 
+                        userId, oauthAccount.getProviderId());
+            } catch (Exception e) {
+                log.error("[User] 카카오 연동 해제 API 호출 실패: userId={}, error={}", 
+                        userId, e.getMessage());
+                // API 호출 실패해도 회원탈퇴는 계속 진행
+            }
+        }
+
+        // 3. OAuth 계정 Soft Delete
         if (oauthAccount != null) {
             oauthAccount.delete();
             userOauthAccountRepository.save(oauthAccount);
             log.debug("[User] OAuth 계정 삭제 완료: userId={}", userId);
         }
 
-        // 3. 사용자 정보 Soft Delete
+        // 4. 사용자 정보 Soft Delete
         user.delete();
         userRepository.save(user);
         log.info("[User] 회원 탈퇴 완료: userId={}", userId);
 
-        // 4. 쿠키 삭제
+        // 5. 쿠키 삭제
         cookieProvider.deleteCookiesFromResponse(response);
         log.debug("[User] 쿠키 삭제 완료: userId={}", userId);
     }

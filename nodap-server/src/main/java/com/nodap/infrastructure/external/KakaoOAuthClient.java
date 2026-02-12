@@ -101,6 +101,41 @@ public class KakaoOAuthClient {
     }
 
     /**
+     * 카카오 연동 해제
+     * @param targetId 카카오 사용자 ID (providerId)
+     */
+    public void unlink(String targetId) {
+        try {
+            log.debug("[Kakao] 카카오 연동 해제 요청: targetId={}", targetId);
+            
+            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+            formData.add("target_id_type", "user_id");
+            formData.add("target_id", targetId);
+            
+            // Admin Key를 사용하여 연동 해제 (KakaoAK 방식)
+            webClient.post()
+                    .uri(kakaoProperties.unlinkUri())
+                    .header("Authorization", "KakaoAK " + kakaoProperties.clientId())
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(BodyInserters.fromFormData(formData))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            
+            log.info("[Kakao] 카카오 연동 해제 성공: targetId={}", targetId);
+        } catch (WebClientResponseException e) {
+            log.error("[Error-KAKAO_ERR] 카카오 연동 해제 실패: status={}, body={}", 
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            // 연동 해제 실패해도 회원탈퇴는 진행 (이미 DB에서 삭제 처리)
+            log.warn("[Kakao] 카카오 연동 해제 실패했지만 회원탈퇴는 계속 진행: targetId={}", targetId);
+        } catch (Exception e) {
+            log.error("[Error-KAKAO_ERR] 카카오 연동 해제 API 호출 실패: {}", e.getMessage());
+            // 연동 해제 실패해도 회원탈퇴는 진행 (이미 DB에서 삭제 처리)
+            log.warn("[Kakao] 카카오 연동 해제 실패했지만 회원탈퇴는 계속 진행: targetId={}", targetId);
+        }
+    }
+
+    /**
      * 카카오 토큰 응답 DTO
      */
     public record KakaoTokenResponse(
