@@ -1,5 +1,6 @@
 package com.nodap.domain.music.repository;
 
+import com.nodap.domain.album.entity.Album;
 import com.nodap.domain.music.entity.Music;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

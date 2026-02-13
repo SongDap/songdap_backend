@@ -96,11 +96,9 @@ public class MusicService {
             throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
 
-        boolean canAdd = !isOwner;
+        boolean canAdd = album.canAddMusic();
 
-        if(album.getMusicCount()>=album.getMusicCountLimit()){
-            canAdd = false;
-        }
+        if(isOwner) canAdd = false;
 
         Page<MusicInfo> items =
                 musicRepository.findByAlbumIdAndNotDeleted(album.getId(), pageable)
@@ -159,12 +157,16 @@ public class MusicService {
             throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
 
-        musicRepository.findByUuid(musicUuid)
+        Music music = musicRepository.findByUuid(musicUuid)
                 .orElseThrow(() -> new IllegalArgumentException("노래가 존재하지 않습니다."));
 
         if (!musicRepository.canDeleteMusic(musicUuid, userId)) {
             throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
+
+        Album album = music.getAlbum();
+
+        album.removeMusic(music);
 
         musicRepository.deleteByUuid(musicUuid);
     }

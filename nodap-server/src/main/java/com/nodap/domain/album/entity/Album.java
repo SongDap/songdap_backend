@@ -139,6 +139,7 @@ public class Album extends BaseTimeEntity {
         if (this.musicCountLimit == null || this.musicCountLimit == 0) {
             return true;
         }
+
         return this.musicCount < this.musicCountLimit;
     }
 }
